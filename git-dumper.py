@@ -272,6 +272,7 @@ class FindObjectsWorker(DownloadWorker):
         printf('[-] Fetching %s/%s [%d]\n', url, filepath, response.status_code)
 
         if response.status_code != 200:
+            print(f"reponse {response.status_code}, {url}")
             return []
 
         abspath = os.path.abspath(os.path.join(directory, filepath))
@@ -365,6 +366,8 @@ def fetch_git(url, directory, jobs, retry, timeout):
     # find refs
     printf('[-] Finding refs/\n')
     tasks = [
+        '.git/CHERRY_PICK_HEAD',
+        '.git/MERGE_HEAD',
         '.git/FETCH_HEAD',
         '.git/HEAD',
         '.git/ORIG_HEAD',
@@ -372,6 +375,8 @@ def fetch_git(url, directory, jobs, retry, timeout):
         '.git/info/refs',
         '.git/logs/HEAD',
         '.git/logs/refs/heads/master',
+        '.git/refs/wip/wtree/refs/heads/master',
+        '.git/refs/wip/index/refs/heads/master',
         '.git/logs/refs/remotes/origin/HEAD',
         '.git/logs/refs/remotes/origin/master',
         '.git/logs/refs/stash',
@@ -472,7 +477,7 @@ def fetch_git(url, directory, jobs, retry, timeout):
     os.chdir(directory)
 
     # ignore errors
-    subprocess.call(['git', 'checkout', '.'], stderr=open(os.devnull, 'wb'))
+    # subprocess.call(['git', 'checkout', 'master', '.'], stderr=open(os.devnull, 'wb'))
 
     return 0
 
